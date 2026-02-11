@@ -1,0 +1,21 @@
+# Build Lambda package on Linux (required for Lambda compatibility)
+FROM public.ecr.aws/lambda/python:3.11 AS builder
+
+WORKDIR /build
+
+# Copy requirements first for caching
+COPY requirements.txt .
+
+# Install dependencies to package dir (Lambda Linux environment)
+RUN pip install -r requirements.txt -t ./package --upgrade
+
+# Copy application code
+COPY main.py lambda_handler.py ./package/
+
+# Create zip (using Python since zip cmd may not be in Lambda image)
+RUN cd package && python -c "import zipfile, os; z = zipfile.ZipFile('/lambda.zip', 'w', zipfile.ZIP_DEFLATED); [z.write(os.path.join(r,f), os.path.relpath(os.path.join(r,f), '.')) for r,d,fs in os.walk('.') for f in fs]; z.close()" && cd ..
+
+# Final stage - minimal image to copy artifact
+FROM alpine:latest
+COPY --from=builder /lambda.zip /lambda.zip
+CMD ["cp", "/lambda.zip", "/output/lambda.zip"]
