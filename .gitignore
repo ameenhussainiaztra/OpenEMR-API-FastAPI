@@ -43,11 +43,3 @@ Thumbs.db
 
 # Token storage (if using file-based storage)
 tokens.json
-
-# Terraform
-terraform/.terraform/
-terraform/*.tfstate
-terraform/*.tfstate.*
-terraform/.terraform.lock.hcl
-terraform/lambda.zip
-terraform/terraform.tfvars
