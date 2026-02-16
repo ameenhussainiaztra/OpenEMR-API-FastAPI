@@ -190,18 +190,9 @@ The `--reload` flag enables auto-reload on code changes.
 ```
 .
 ├── main.py              # FastAPI application
-├── lambda_handler.py    # AWS Lambda handler (Mangum adapter)
 ├── requirements.txt     # Python dependencies
-├── terraform/           # AWS Lambda deployment (Terraform)
-│   ├── main.tf          # Lambda, API Gateway, IAM
-│   ├── variables.tf     # Input variables
-│   ├── outputs.tf       # API URL outputs
-│   └── terraform.tfvars.example
-├── scripts/
-│   ├── build_lambda.ps1 # Windows build script
-│   └── build_lambda.sh # Linux/macOS build script
-├── README.md            # This file
-└── .env                 # Environment variables (create this)
+├── README.md           # This file
+└── .env                # Environment variables (create this)
 ```
 
 ## Security Notes
@@ -241,76 +232,6 @@ Once the server is running, visit:
 - **ReDoc:** http://localhost:8000/redoc
 
 Both provide interactive documentation where you can test endpoints directly.
-
-## AWS Lambda Deployment (Terraform)
-
-Deploy this application to AWS Lambda using Terraform with API Gateway.
-
-### Prerequisites
-
-- Python 3.11+
-- AWS CLI configured with credentials
-- Terraform >= 1.0
-- OpenEMR server URL and OAuth credentials
-
-### Deploy Steps
-
-1. **Build the Lambda deployment package:**
-
-   **Recommended (Docker - ensures Linux compatibility for Lambda):**
-   ```bash
-   docker build -f scripts/Dockerfile.lambda-build --output terraform .
-   # Creates terraform/lambda.zip (requires Docker BuildKit: DOCKER_BUILDKIT=1)
-   ```
-
-   **Windows (PowerShell):**
-   ```powershell
-   .\scripts\build_lambda.ps1
-   ```
-
-   **Linux/macOS:**
-   ```bash
-   chmod +x scripts/build_lambda.sh
-   ./scripts/build_lambda.sh
-   ```
-
-   > **Note:** Lambda runs on Amazon Linux. If you build on Windows, packages with native binaries (pydantic, pyyaml) may fail. Use Docker build for production.
-
-2. **Configure Terraform variables:**
-   ```bash
-   cd terraform
-   cp terraform.tfvars.example terraform.tfvars
-   # Edit terraform.tfvars with your OpenEMR configuration
-   ```
-
-3. **Deploy:**
-   ```bash
-   terraform init
-   terraform plan
-   terraform apply
-   ```
-
-4. **Configure OpenEMR OAuth:**
-   - Terraform outputs the `oauth_redirect_uri` after deployment
-   - Add this URL to your OpenEMR OAuth client's allowed redirect URIs
-   - Administration → Config → Connectors → your OAuth client
-
-### Post-Deployment
-
-- **API URL:** Shown in `terraform output api_url`
-- **Swagger Docs:** `{api_url}docs`
-- **ReDoc:** `{api_url}redoc`
-
-### Terraform Variables
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `openemr_base_url` | OpenEMR server URL (e.g. https://openemr.example.com) | Yes |
-| `openemr_client_id` | OAuth client ID | Yes |
-| `openemr_client_secret` | OAuth client secret | Yes |
-| `aws_region` | AWS region | No (default: us-east-1) |
-| `lambda_memory_size` | Lambda memory in MB | No (default: 512) |
-| `lambda_timeout` | Lambda timeout in seconds | No (default: 30) |
 
 ## License
 

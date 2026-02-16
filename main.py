@@ -15,12 +15,11 @@ from typing import Optional, List, Dict, Any
 import httpx
 import os
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
-from pathlib import Path
-
-# Load .env from project root (next to main.py)
-load_dotenv(Path(__file__).resolve().parent / ".env")
 import secrets
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Security scheme
 security = HTTPBearer(auto_error=False)
@@ -37,7 +36,10 @@ app = FastAPI(
     - **Interactive Swagger UI** - Test endpoints directly in your browser
     
     ## Quick Start
+    ##http://100.48.98.130/ public ec2 ip 
     
+
+
     1. **Configure Environment Variables:**
        ```bash
        OPENEMR_BASE_URL=https://your-openemr-server
